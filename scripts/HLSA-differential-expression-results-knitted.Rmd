@@ -1,0 +1,983 @@
+---
+title: "Report of HLSA genes (1) listed by SFARI or AutismKB as autism candidate genes, (2) identified as being differentially expressed in autism, (3) identified as being differentially expressed in schizophrenia, (4) identified as being differentially expressed in relevant knockout/knockdowns (e.g. CHD8)"
+
+author: "Ilea Eskildsen Heft"
+date: "March 6, 2016"
+output: word_document
+---
+
+```{r echo = FALSE, message = FALSE}
+library(dplyr)
+library(ggplot2)
+
+no.gene.placeholder <- "NONE"
+
+no.gene.placeholder <- as.data.frame(no.gene.placeholder)
+colnames(no.gene.placeholder) <- c("gene.name")
+```
+# HLSA genes according to Fortna, 2004 and my preliminary BLAT analysis
+
+```{r echo = FALSE}
+
+list.of.genes <- read.delim("~/LabProjects/HLSAgenes/list-of-genes.txt",
+                            sep = "\t",
+                            header = FALSE)
+
+colnames(list.of.genes) <- c("gene.name")
+
+list.of.genes <- list.of.genes %>% arrange(gene.name)
+
+list.of.genes
+```
+
+# Identify HLSA genes that are found in the SFARI and AutKB lists of autism candidate genes
+
+## SFARI (downloaded on:   )
+### HLSA genes in SFARI list 
+```{r echo = FALSE}
+sfari.candidate.list <- read.csv("~/LabProjects/HLSAGenes/sfari-gene/sfari-gene-candidate-list-20160223/gene-summary.csv")
+
+list.of.genes %>% filter(gene.name %in% sfari.candidate.list$Gene.Symbol)
+```
+
+## Autism KB (downloaded on:     )
+
+```{r echo = FALSE}
+autism.kb.core.cand <- read.delim("~/LabProjects/HLSAGenes/autism-kb/core_dataset20121018.txt", sep = "\t")
+autism.kb.syndromic <- read.delim("~/LabProjects/HLSAGenes/autism-kb/syndromic_list20110925.txt", sep = "\t", header = FALSE)
+colnames(autism.kb.syndromic)[1] <- c("gene_symbol")
+
+autism.kb.non.syndromic <- read.delim("~/LabProjects/HLSAGenes/autism-kb/nonsyndromic_list20121018.txt", sep = "\t")
+
+
+hlsa.in.autism.kb.core.list <- list.of.genes %>% filter(gene.name %in% autism.kb.core.cand$gene_symbol)
+hlsa.in.autism.kb.syndromic.list <- list.of.genes %>% filter(gene.name %in% autism.kb.syndromic$gene_symbol)
+hlsa.in.autism.kb.non.syndromic.list <- list.of.genes %>% filter(gene.name %in% autism.kb.non.syndromic$gene_symbol)
+```
+### HLSA genes in Autism KB Core Candidate List
+```{r echo = FALSE}
+hlsa.in.autism.kb.core.list
+```
+
+### HLSA genes in Autism KB Syndromic List
+```{r echo = FALSE}
+hlsa.in.autism.kb.syndromic.list
+```
+
+### HLSA genes in Autism KB Non Syndromic List
+```{r echo = FALSE}
+hlsa.in.autism.kb.non.syndromic.list
+```
+
+
+
+# Studies of Differential Expression in Post-mortem Brain
+
+## Garbett, 2008
+### Samples Size: 6 cases, 6 controls
+### RNA Source: Post-mortem temporal cortex
+### Analysis method: microarray - no model details given
+
+```{r echo = FALSE}
+garbett.08 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/garbett-2008/garbett-2008-supp-1-diff-expressed-genes.csv")
+
+hits.in.garbett <- list.of.genes %>% filter(gene.name %in% garbett.08$SYMBOL)  %>% rbind(no.gene.placeholder)
+
+
+hits.in.garbett %>% filter(gene.name != "NONE")
+
+garbett.08 %>% filter(SYMBOL %in% list.of.genes$gene.name)
+
+hits.in.garbett$study <- "garbett.2008.TemporalCortex"
+hits.in.garbett$RNAsource <- "brain"
+
+
+```
+
+## Voineagu, 2011
+### Sample size: Discovery set: 19 cases and 17 controls, Replication cohort: 9 ASD cases and 5 controls
+### Brain area(s): frontal cortex (BA9), temporal cortex (BA41/42 or BA22) and cerebellum (vermis), with the exception of three controls lacking the cerebellum sample.  Replication set only looked at tissue from frontal cortex (BA44/45).  Analysis focused on "cortex samples" - as they only found two differentially expressed genes in cerebellum.  
+### Analysis technique: Microarray - Illumina Ref8 v3 microarrays
+### Other Notes: Brain area in replication set different from discovery cohort.  Also, not all samples in the replication set were independent from discovery cohorot - they reused cases, and just looked at different brain area.  
+
+```{r echo = FALSE}
+### Read in Voineagu, 2011 data
+voineagu.diff.exp <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/voineagu-2011/voineagu-2011-differential-expression.csv") 
+voineagu.replication.cohort <-read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/voineagu-2011/voineagu-2011-replication-cohort-data.csv")
+voineagu.diff.splicing <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/voineagu-2011/voineagu-2011-differential-splicing-data.csv")
+
+
+### Report genes in my HLSA list that are also reported by voineagu, 2011 ####
+voineagu.diff.expressed <- list.of.genes %>% filter(gene.name %in% voineagu.diff.exp$Gene.Symbol)  %>% rbind(no.gene.placeholder)
+voineagu.replicated.genes <- list.of.genes %>% filter(gene.name %in% voineagu.replication.cohort$Gene.Symbol)  %>% rbind(no.gene.placeholder)
+hits.in.voineagu.diff.splicing <- list.of.genes %>% filter(gene.name %in% voineagu.diff.splicing$Gene.Symbol)  %>% rbind(no.gene.placeholder)
+
+```
+
+### Genes differentially expressed in discovery cohort
+```{r echo = FALSE}
+voineagu.diff.expressed %>% filter(gene.name != "NONE")
+
+voineagu.diff.expressed$study <- "voineagu.2011.CortexSamples.discovery"
+voineagu.diff.expressed$RNAsource <- "brain"
+
+voineagu.diff.exp %>% filter(Gene.Symbol %in% list.of.genes$gene.name)
+
+
+```
+
+### Differentially expressed genes that were replicated
+```{r echo = FALSE}
+voineagu.replicated.genes %>% filter(gene.name != "NONE")
+
+voineagu.replicated.genes$study <- "voineagu.2011.CortexSamples.replication"
+voineagu.replicated.genes$RNAsource <- "brain"
+
+
+voineagu.replication.cohort %>% filter(Gene.Symbol %in% list.of.genes$gene.name)
+```
+
+### Genes that were determined to have been differentially spliced in autism cases compared to controls
+``` {r echo = FALSE}
+hits.in.voineagu.diff.splicing %>% filter(gene.name != "NONE")
+
+hits.in.voineagu.diff.splicing$study <- "voineagu.2011.CortexSamples.diff.splicing"
+hits.in.voineagu.diff.splicing$RNAsource <- "brain"
+
+
+
+voineagu.diff.splicing %>% filter(Gene.Symbol %in% list.of.genes$gene.name)
+```
+
+
+## Chow, 2012
+### Sample Size: Young = 9 cases, 7 controls; Adult = 6 cases, 11 controls
+### RNA Source: Dorsolateral prefrontal cortex
+### Analysis method: Microarray - Illumina Human-Ref8 v3 microarray [27,28].
+
+```{r echo = FALSE}
+chow.supp.2.diff.expressed.in.young.cases <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/chow-2012/chow-12-supp-table-2.csv")
+chow.supp.4.top.diff.expressed.in.adult.cases <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/chow-2012/chow-12-supp-table-4.csv")
+chow.supp.5.top.diff.expressed.across.young.and.adult <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/chow-2012/chow-12-supp-table-5.csv")
+
+
+
+
+chow.young <- list.of.genes %>% filter(gene.name %in% chow.supp.2.diff.expressed.in.young.cases$Gene)  %>% rbind(no.gene.placeholder)
+chow.top.adult <- list.of.genes %>% filter(gene.name %in% chow.supp.4.top.diff.expressed.in.adult.cases$Symbol) %>% rbind(no.gene.placeholder)
+chow.top.young.and.adult <- list.of.genes %>% filter(gene.name %in% chow.supp.5.top.diff.expressed.across.young.and.adult$Symbol) %>% rbind(no.gene.placeholder)
+```
+#### HLSA genes differentially expressed in brains of young (2-14 years) autism cases (9 cases, 7 controls)
+```{r echo = FALSE}
+chow.young %>% filter(gene.name != "NONE")
+
+chow.supp.2.diff.expressed.in.young.cases %>% filter(Gene %in% list.of.genes$gene.name)
+
+chow.young$study <- "chow.2012.PrefronalCortex.young"
+chow.young$RNAsource <- "brain"
+
+
+```
+#### HLSA genes differentially expressed in brains of adult (15 - 56 years) autism cases (6 cases, 11 controls)
+``` {r echo = FALSE}
+chow.top.adult %>% filter(gene.name != "NONE")
+
+chow.top.adult$study <- "chow.2012.PrefrontalCortex.adult"
+chow.top.adult$RNAsource <- "brain"
+
+
+```
+#### HLSA genes differentially expressed across both young and adult cases
+```{r echo = FALSE}
+chow.top.young.and.adult %>% filter(gene.name != "NONE")
+
+chow.supp.5.top.diff.expressed.across.young.and.adult %>%filter(Symbol %in% list.of.genes$gene.name)
+  
+chow.top.young.and.adult$study <- "chow.2012.PrefrontalCortex.YoungAndAdult"
+chow.top.young.and.adult$RNAsource <- "brain"
+
+
+```
+
+## Ginsberg, 2012
+### Sample Size:
+### RNA Source: cerebellar & BA19 (occiptal) post-mortem brain 
+### Analysis method: microarray
+
+```{r echo = FALSE}
+ginsberg.supp.3.top.diff.cntrllng.for.brain.region <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/ginsberg-2012/ginsberg-2012-supp-table-3.csv")
+ginsberg.supp.6.top.diff.in.cerebellum <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/ginsberg-2012/ginsberg-2012-supp-table-6.csv")
+
+
+
+hits.in.ginsberg.cntrllng.for.brain.region <- list.of.genes %>% filter(gene.name %in% ginsberg.supp.3.top.diff.cntrllng.for.brain.region$Gene.symbol) %>% rbind(no.gene.placeholder)
+hits.in.ginsberg.cerebellum <- list.of.genes %>% filter(gene.name %in% ginsberg.supp.6.top.diff.in.cerebellum$Gene.symbol) %>% rbind(no.gene.placeholder)
+```
+#### HLSA genes within the list of top differentially expressed genes after controlling for brain region
+```{r echo = FALSE}
+hits.in.ginsberg.cntrllng.for.brain.region %>% filter(gene.name != "NONE")
+
+hits.in.ginsberg.cntrllng.for.brain.region$study <- "ginsberg.2012.CerebellarAndBA19"
+hits.in.ginsberg.cntrllng.for.brain.region$RNAsource <- "brain"
+
+
+```
+#### HLSA genes within the list of top differentially expressed genes in the cerebellum.
+```{r echo = FALSE}
+hits.in.ginsberg.cerebellum %>% filter(gene.name != "NONE")
+
+hits.in.ginsberg.cerebellum$study <- "ginsberg.2012.cerebellum"
+hits.in.ginsberg.cerebellum$RNAsource <- "brain"
+
+```
+
+## Ziats, 2012
+### Sample Size: 2 cases and 2 age & sex-matched controls
+### RNA Source: prefrontal cortex and cerebellum
+### Analysis method: Microarray: ArrayStar, Inc (Rockville, MD, USA) Human lncRNA Microarray V2.0, For mRNA analysis: 
+
+```{r echo = FALSE}
+ziats.2012.lncRNA <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/ziats-2012/ziats-2012-diff-exprs-lncRNAs.csv")
+ziats.2012.mRNA.pfc <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/ziats-2012/ziats-2012-diff-exprs-mRNA-prefrontal-cortex.csv")
+ziats.2012.mRNA.cerebellum <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/ziats-2012/ziats-2012-diff-exprs-mRNA-cerebellum.csv")
+
+hits.in.ziats.2012.lncRNA <- list.of.genes %>% filter(gene.name %in% ziats.2012.lncRNA$Sequence.Symbol) %>% rbind(no.gene.placeholder)
+hits.in.ziats.2012.mRNA.pfc <- list.of.genes %>% filter(gene.name %in% ziats.2012.mRNA.pfc$GeneSymbol) %>% rbind(no.gene.placeholder)
+hits.in.ziats.2012.mRNA.cerebellum <- list.of.genes %>% filter(gene.name %in% ziats.2012.mRNA.cerebellum$GeneSymbol) %>% rbind(no.gene.placeholder)
+
+
+```
+#### HLSA genes in list of differentially expressed lncRNAs
+```{r echo = FALSE}
+hits.in.ziats.2012.lncRNA %>% filter(gene.name != "NONE")
+
+hits.in.ziats.2012.lncRNA$study <- "ziats.2012.CortexAndCerebellum.lncRNAs"
+hits.in.ziats.2012.lncRNA$RNAsource <- "brain"
+
+
+```
+#### HLSA genes in list of differentially expressed mRNAs in prefrontal cortex
+```{r echo = FALSE}
+hits.in.ziats.2012.mRNA.pfc %>% filter(gene.name != "NONE")
+
+ziats.2012.mRNA.pfc %>% filter(GeneSymbol %in% list.of.genes$gene.name)
+
+hits.in.ziats.2012.mRNA.pfc$study <- "ziats.2012.PrefrontalCortex.mRNA"
+hits.in.ziats.2012.mRNA.pfc$RNAsource <- "brain"
+
+```
+#### HLSA genes in list of differentially expressed mRNAs in cerebellum
+```{r echo = FALSE}
+hits.in.ziats.2012.mRNA.cerebellum %>% filter(gene.name != "NONE")
+
+ziats.2012.mRNA.cerebellum %>% filter(GeneSymbol %in% list.of.genes$gene.name)
+
+
+hits.in.ziats.2012.mRNA.cerebellum$study <- "ziats.2012.cerebellum.mRNA"
+hits.in.ziats.2012.mRNA.cerebellum$RNAsource <- "brain"
+
+```
+
+
+## Gupta, 2014
+### Sample Size: 47 (32 unique individuals) autism and 57 (40 unique individuals) controls 
+### RNA Source: Brain regions;Multiple cortical tissues corresponding to Brodmann Area 19 (BA19), Brodmann Area 10 (BA10) and Brodmann Area 44 (BA44) were sequenced in 62, 14 and 28 samples, respectively
+### Analysis method: RNA-Seq
+
+#### HLSA genes in top differentially expressed genes 
+```{r echo = FALSE}
+gupta.2014.genes <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/gupta-2014/gupta-2014-top-diff-expressed-genes.csv")
+
+hits.in.gupta <- list.of.genes %>% filter(gene.name %in% gupta.2014.genes$Gene) %>% rbind(no.gene.placeholder)
+
+
+hits.in.gupta  %>% filter(gene.name != "NONE")
+
+gupta.2014.genes %>% filter(Gene %in% list.of.genes$gene.name)
+
+hits.in.gupta$study <- "gupta.2012.CorticalTissues"
+hits.in.gupta$RNAsource <- "brain"
+
+```
+
+
+```{r echo = FALSE}
+# Merge the results of all of the brain studies
+
+all.brain.hits <- rbind(hits.in.garbett, voineagu.diff.expressed, voineagu.replicated.genes, hits.in.voineagu.diff.splicing, chow.young, chow.top.adult, chow.top.young.and.adult, hits.in.ginsberg.cerebellum,hits.in.ginsberg.cntrllng.for.brain.region, hits.in.ziats.2012.lncRNA, hits.in.ziats.2012.mRNA.pfc, hits.in.ziats.2012.mRNA.cerebellum, hits.in.gupta) %>% arrange(gene.name)
+
+# all.brain.hits %>% group_by(gene.name) %>% summarise(count = n()) %>% filter(gene.name != "NONE") %>% arrange(desc(count), gene.name)
+
+write.table(all.brain.hits, file = "~/LabProjects/HLSAGenes/summary-of-brain-expression-hits.txt", row.names=FALSE, sep = "\t")
+
+## Run the below code in the command line to nicely summarize the hits, then turn the results of that code into a nice table you can paste into 
+#    a summary report
+
+# bedtools groupby -i summary-of-brain-expression-hits.txt -g 1 -c 2,3 -o distinct,count > summary-of-brain-expression-hits-counts.txt
+
+#brain.hits.summary <- read.delim("~/LabProjects/HLSAGenes/summary-of-brain-expression-hits-counts.txt")
+
+#brain.hits.summary
+```
+# Studies of differential expression lymphoblastoid cell lines (LCLs)
+
+## Nishimura, 2007  *** Note: Used LCL from snydromic cases ***
+### Sample Size: 8 males with FMR1-FM, 7 males with dup(15q), 27 controls (confirm num. of controls used in analysis)
+### RNA Source: LCLs
+### Analysis Method: Microarray - Whole Human Genome Array G4112A (Agilent)
+### Other Notes: ** Need to incorporate results from body of paper
+```{r echo = FALSE}
+
+nishimura.07.combined.fmr1.dup15q.vs.controls <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/nishimura-2007/nishimura-07-supp2-combined-fmr1-dup15q-vs-controls.csv")
+nishimura.07.fmr1.sam <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/nishimura-2007/nishimura-2007-supp3-autism-fmr1-by-SAM.csv")
+nishimura.07.fmr1.RankPod <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/nishimura-2007/nishimura-2007-supp5-autism-fmr1-by-RankPod.csv")
+nishimura.07.dup15q.sam <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/nishimura-2007/nishimura-2007-supp4-autism-dup15q-by-SAM.csv")
+nishimura.07.dup15q.RankPod <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/nishimura-2007/nishimura-07-supp6-autism-dup15q-diff-exps-by-RankPod.csv")
+
+hits.in.nishimura.combined.fmr1.dup15q <- list.of.genes %>% filter(gene.name %in% nishimura.07.combined.fmr1.dup15q.vs.controls$Symbol) %>% rbind(no.gene.placeholder)
+
+hits.in.nishimura.fmr1.sam <- list.of.genes %>% filter(gene.name %in% nishimura.07.fmr1.sam$Symbol) %>% rbind(no.gene.placeholder)
+
+hits.in.nishimura.fmr1.RankPod <- list.of.genes %>% filter(gene.name %in% nishimura.07.fmr1.RankPod$Symbol) %>% rbind(no.gene.placeholder)
+
+hits.in.nishimura.dup15q.sam <- list.of.genes %>% filter(gene.name %in% nishimura.07.dup15q.sam$Symbol) %>% rbind(no.gene.placeholder)
+
+hits.in.nishimura.dup15q.RankPod <- list.of.genes %>% filter(gene.name %in% nishimura.07.dup15q.RankPod$Symbol) %>% rbind(no.gene.placeholder)
+
+
+
+```
+#### HLSA genes in list of differentially expressed genes from combined analysis of FMR1-FM & dup15q vs controls
+```{r echo = FALSE}
+hits.in.nishimura.combined.fmr1.dup15q %>% filter(gene.name != "NONE")
+
+hits.in.nishimura.combined.fmr1.dup15q$study <- "nishimura.2007.LCL.fmr1.dup15q"
+hits.in.nishimura.combined.fmr1.dup15q$RNAsource <- "LCL"
+
+nishimura.07.combined.fmr1.dup15q.vs.controls %>% filter(Symbol %in% list.of.genes$gene.name)
+
+
+```
+#### HLSA genes in list of differentially expressed genes in FMR1-FM as determined by SAM
+```{r echo = FALSE}
+hits.in.nishimura.fmr1.sam %>% filter(gene.name != "NONE")
+
+hits.in.nishimura.fmr1.sam$study <- "nishimura.2007.LCL.fmr1"
+hits.in.nishimura.fmr1.sam$RNAsource <- "LCL"
+
+nishimura.07.fmr1.sam %>% filter(Symbol %in% list.of.genes$gene.name)
+```
+#### HLSA genes in list of differentially expressed genes in FMR1-FM as determined by RankPod
+```{r echo = FALSE}
+hits.in.nishimura.fmr1.RankPod %>% filter(gene.name != "NONE")
+
+hits.in.nishimura.fmr1.RankPod$study <- "nishimura.2007.LCL.fmr1"
+hits.in.nishimura.fmr1.RankPod$RNAsource <- "LCL"
+```
+#### HLSA genes in list of differentially expressed genes in dup15q as determined by SAM
+```{r echo = FALSE}
+hits.in.nishimura.dup15q.sam %>% filter(gene.name != "NONE")
+
+hits.in.nishimura.dup15q.sam$study <- "nishimura.2007.LCL.dup15q"
+hits.in.nishimura.dup15q.sam$RNAsource <- "LCL"
+```
+#### HLSA genes in list of differentially expressed genes in dup15q as determined by RankPod
+```{r echo = FALSE}
+hits.in.nishimura.dup15q.RankPod %>% filter(gene.name != "NONE")
+
+hits.in.nishimura.dup15q.RankPod$study <- "nishimura.2007.LCL.dup15q"
+hits.in.nishimura.dup15q.RankPod$RNAsource <- "LCL"
+```
+
+
+## Hu, 2009 - Autism Research
+### Sample Size: 116 cases, 116 controls
+### RNA Source: LCL
+### Analysis Technique: Microarry - TIGR 40K human arrays
+### Other notes: Completed analysis on all autism cases vs. controls as well as each of three phenotypic sub-groups vs controls
+
+
+```{r echo = FALSE}
+# Note: formatting is odd here, but this is a list of genes already noted to be differentially expressed, so the important thing is just to see if the gene name is in this #list then can refer back to original table or play with formatting to get more info
+
+hu.language.impaired.vs.controls.fdr.5percent<- read.delim("~/LabProjects/GeneExpression/differential-expression-in-autism/hu-2009/hu-supp-table-8.txt")
+hu.all.autism.vs.controls <- read.delim("~/LabProjects/GeneExpression/differential-expression-in-autism/hu-2009/hu-supp-table-3.txt")
+hu.supp.tbl.4 <- read.delim("~/LabProjects/GeneExpression/differential-expression-in-autism/hu-2009/hu-supp-table-4.txt")
+hu.language.impaired.vs.controls.fdr.0.1percent <- read.delim("~/LabProjects/GeneExpression/differential-expression-in-autism/hu-2009/hu-supp-table-5.txt")
+hu.supp.tbl.6 <- read.delim("~/LabProjects/GeneExpression/differential-expression-in-autism/hu-2009/hu-supp-table-6.txt")
+hu.supp.tbl.7 <- read.delim("~/LabProjects/GeneExpression/differential-expression-in-autism/hu-2009/hu-supp-table-7.txt")
+hu.tbl.3.across.all.subroups <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/hu-2009/hu-2009-auts-rsrch-table-3-diff-exprs-genes-across-all-subgroups.csv")
+
+
+hu.2009.AutsRsrch.4.class.analysis <- list.of.genes %>% filter(gene.name %in% hu.supp.tbl.4$GENE_SYMBOL) %>% rbind(no.gene.placeholder)
+hu.2009.AutsRsrch.language.impaired.fdr.5percent <- list.of.genes %>% filter(gene.name %in% hu.language.impaired.vs.controls.fdr.5percent$GENE_SYMBOL) %>% rbind(no.gene.placeholder)
+hu.2009.AutsRsrch.language.impaired.fdr.0.1.percent <- list.of.genes %>% filter(gene.name %in% hu.language.impaired.vs.controls.fdr.0.1percent$GENE_SYMBOL) %>% rbind(no.gene.placeholder)
+hu.2009.AutsRsrch.mild.symptom <- list.of.genes %>% filter(gene.name %in% hu.supp.tbl.6$GENE_SYMBOL) %>% rbind(no.gene.placeholder)
+hu.2009.AutsRsrch.savant.group <- list.of.genes %>% filter(gene.name %in% hu.supp.tbl.7$GENE_SYMBOL) %>% rbind(no.gene.placeholder)
+hu.2009.AutsRsrch.all.autism.vs.controls <- list.of.genes %>% filter(gene.name %in% hu.all.autism.vs.controls$GENE_SYMBOL) %>% rbind(no.gene.placeholder)
+hu.2009.AutsRsrch.diff.across.all.subgroups <- list.of.genes %>% filter(gene.name %in% hu.tbl.3.across.all.subroups$Associated.gene) %>% rbind(no.gene.placeholder)
+
+
+```
+
+### HLSA Genes differentially expressed when all autism cases compared to controls
+```{r echo = FALSE}
+hu.2009.AutsRsrch.all.autism.vs.controls %>% filter(gene.name != "NONE")
+
+hu.2009.AutsRsrch.all.autism.vs.controls$study <- "hu.2009.AutsRsrch.LCL.all.vs.controls"
+hu.2009.AutsRsrch.all.autism.vs.controls$RNAsource <- "LCL"
+```
+
+### HLSA genes differentially expressed in each of the three sub-group comparisons (I think)
+```{r echo = FALSE}
+hu.2009.AutsRsrch.diff.across.all.subgroups %>% filter(gene.name != "NONE")
+
+hu.2009.AutsRsrch.diff.across.all.subgroups$study <- "hu.2009.AutsRsrch.LCL.all.subgroups"
+hu.2009.AutsRsrch.diff.across.all.subgroups$RNAsource <- "LCL"
+
+```
+
+### HLSA genes significant in the 4 class analysis (don't know what "4 class analysis means")
+```{r echo = FALSE}
+hu.2009.AutsRsrch.4.class.analysis %>% filter(gene.name != "NONE")
+
+hu.supp.tbl.4 %>% filter(GENE_SYMBOL %in% list.of.genes$gene.name)
+
+hu.2009.AutsRsrch.4.class.analysis$study <- "hu.2009.AutsRsrch.LCL.4.class.analysis"
+hu.2009.AutsRsrch.4.class.analysis$RNAsource <- "LCL"
+
+```
+
+### HLSA genes differentially expressed in language impaired sub-group compared to controls at 5% FDR and at 0.1% FDR
+#### 0.1% FDR
+```{r echo = FALSE}
+hu.2009.AutsRsrch.language.impaired.fdr.0.1.percent  %>% filter(gene.name != "NONE")
+
+hu.2009.AutsRsrch.language.impaired.fdr.0.1.percent$study <- "hu.2009AutsRsrch.LCL.language.impaired.0.1percent"
+hu.2009.AutsRsrch.language.impaired.fdr.0.1.percent$RNAsource <- "LCL"
+```
+#### 5% FDR
+``` {r echo = FALSE}
+hu.2009.AutsRsrch.language.impaired.fdr.5percent  %>% filter(gene.name != "NONE")
+
+hu.language.impaired.vs.controls.fdr.5percent %>% filter(GENE_SYMBOL %in% list.of.genes$gene.name)
+
+hu.2009.AutsRsrch.language.impaired.fdr.5percent$study <- "hu.2009.AutsRsrch.LCL.language.impaired.5percent"
+hu.2009.AutsRsrch.language.impaired.fdr.5percent$RNAsource <- "LCL"
+```
+
+### HLSA genes differentially expressed in mild symptom sub-group compared to controls
+``` {r echo = FALSE}
+hu.2009.AutsRsrch.mild.symptom %>% filter(gene.name != "NONE")
+
+hu.2009.AutsRsrch.mild.symptom$study <- "hu.2009.AutsRsrch.LCL.mild.symptom"
+hu.2009.AutsRsrch.mild.symptom$RNAsource <- "LCL"
+```
+
+### HLSA genes differentially expressed in savant sub-group compared to controls
+``` {r echo = FALSE}
+hu.2009.AutsRsrch.savant.group %>% filter(gene.name != "NONE")
+
+hu.2009.AutsRsrch.savant.group$study <- "hu.2009.AutsRsrch.LCL.savant"
+hu.2009.AutsRsrch.savant.group$RNAsource <- "LCL"
+
+```
+
+## Hu, 2009 - PLOS
+### Sample Size: 21 cases and their 21 unaffected siblings.  Cases are all males from the author defined "severe language impairement sub-group", all controls are male siblings
+### RNA Source: LCL
+### Analysis Technique: Microarry - custom array
+
+```{r echo = FALSE}
+hu.2009.plos <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/hu-2009-plos/hu-2009-plos-diff-expressed-genes.csv")
+
+hits.in.hu.2009.plos <- list.of.genes %>% filter(gene.name %in% hu.2009.plos$Gene.Symbol) %>% rbind(no.gene.placeholder)
+
+
+hits.in.hu.2009.plos  %>% filter(gene.name != "NONE")
+
+hits.in.hu.2009.plos$study <- "hu.2009.Plos.LCL"
+hits.in.hu.2009.plos$RNAsource <- "LCL"
+```
+
+## Seno, 2010
+### Sample Size: 20 cases and their 22 unaffected siblings
+### RNA Source: LCL
+### Analysis Technique: Microarry - Illumina HumanRef-8_V3 gene expression arrays
+
+```{r echo = FALSE}
+seno <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/seno-2010/seno-2010-supp-table-1.csv")
+
+hits.in.seno.2010 <- list.of.genes %>% filter(gene.name %in% seno$SYMBOL) %>% rbind(no.gene.placeholder)
+
+hits.in.seno.2010  %>% filter(gene.name != "NONE")
+
+hits.in.seno.2010$study <- "seno.2010.LCL"
+hits.in.seno.2010$RNAsource <- "LCL"
+
+
+```
+
+## Luo, 2012
+### Sample Size:
+### RNA Source: LCL
+### Analysis method: microarray
+### Other Notes: Looked at changes in expression of genes within or near CNVs detected in ASD cases
+
+#### HLSA genes within/nearby ASD case CNVs that are up or down-regulated
+```{r echo = FALSE}
+luo.2012 <- read.delim("~/LabProjects/GeneExpression/differential-expression-in-autism/luo-2012/luo-2012-supp-table-5-formatted.txt", header = FALSE)
+colnames(luo.2012) <- c("cnv.chrom","cnv.start","cnv.end","gene")
+
+hits.in.luo.2012 <- list.of.genes %>% filter(gene.name %in% luo.2012$gene) %>% rbind(no.gene.placeholder)
+
+hits.in.luo.2012 %>% filter(gene.name != "NONE")
+
+luo.2012 %>% filter(gene %in% list.of.genes$gene.name)
+
+hits.in.luo.2012$study <- "luo.2012.LCL.cnv.associated"
+hits.in.luo.2012$RNAsource <- "LCL"
+
+
+
+```
+
+
+## Blumenthal, 2014
+### Sample Size: 34 individuals from seven multiplex ASD families (4 deletion, 10 duplication, 20 controls)
+### RNASource: LCLs from multiplex ASD cases
+### Analysis method: RNA-Seq
+
+```{r echo = FALSE}
+
+blumenthal.14.LCL.reciprocal <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/blumenthal-2014/blumenthal-14-tableS3-human-LCL-reciprocal.csv")
+
+blumenthal.14.LCL.dup <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/blumenthal-2014/blumenthal-14-tableS3-human-LCL-dup.csv")
+
+blumenthal.14.LCL.del <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/blumenthal-2014/blumenthal-14-tableS3-human-LCL-deletion.csv")
+
+hits.in.blumenthal.14.LCL.recip <- list.of.genes %>% filter(gene.name %in% blumenthal.14.LCL.reciprocal$GeneID)
+
+hits.in.blumenthal.14.LCL.recip$study <- "blumenthal.14.LCL.16p11.recip"
+hits.in.blumenthal.14.LCL.recip$RNAsource <- "LCL"
+
+blumenthal.14.LCL.reciprocal %>% filter(GeneID %in% list.of.genes$gene.name)
+
+hits.in.blumenthal.14.LCL.dup <- list.of.genes %>% filter(gene.name %in% blumenthal.14.LCL.dup$GeneID)
+
+hits.in.blumenthal.14.LCL.dup$study <- "blumenthal.14.LCL.16p11.dup"
+hits.in.blumenthal.14.LCL.dup$RNAsource <- "LCL"
+
+blumenthal.14.LCL.dup %>% filter(GeneID %in% list.of.genes$gene.name)
+
+hits.in.blumenthal.14.LCL.del <- list.of.genes %>% filter(gene.name %in% blumenthal.14.LCL.del$GeneID)
+
+hits.in.blumenthal.14.LCL.del$study <- "blumenthal.14.LCL.16p11.del"
+hits.in.blumenthal.14.LCL.del$RNAsource <- "LCL"
+
+blumenthal.14.LCL.del %>% filter(GeneID %in% list.of.genes$gene.name)
+
+#### Blumenthal mouse
+blumenthal.14.mouse.recip <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/blumenthal-2014/blumenthal-14-tableS3-mouse-reciprocal.csv")
+
+blumenthal.14.mouse.del <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/blumenthal-2014/blumenthal-14-tableS3-mouse-deletion.csv")
+
+blumenthal.14.mouse.dup <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/blumenthal-2014/blumenthal-14-tableS3-mouse-dup.csv")
+
+hits.in.blumenthal.14.mouse.recip <- list.of.genes %>% filter(gene.name %in% blumenthal.14.mouse.recip$Human.Symbol)
+
+hits.in.blumenthal.14.mouse.recip$study <- "blumenthal.14.mouse.cortical.16p11.recip"
+hits.in.blumenthal.14.mouse.recip$RNAsource <- "mouse.cortical"
+
+hits.in.blumenthal.14.mouse.dup <- list.of.genes %>% filter(gene.name %in% blumenthal.14.mouse.dup$Human.Symbol)
+
+hits.in.blumenthal.14.mouse.dup$study <- "blumenthal.14.mouse.cortical.16p11.dup"
+hits.in.blumenthal.14.mouse.dup$RNAsource <- "mouse.cortical"
+
+hits.in.blumenthal.14.mouse.del <- list.of.genes %>% filter(gene.name %in% blumenthal.14.mouse.del$Human.Symbol)
+
+hits.in.blumenthal.14.mouse.del$study <- "blumenthal.14.mouse.cortical.16p11.del"
+hits.in.blumenthal.14.mouse.del$RNAsource <- "mouse.cortical"
+
+
+```
+
+## Migliavacca, 2015
+### Sample Size: 16p11.2 deletion & duplication carriers compared to controls
+### RNA Source: LCLs
+### Analysis method: microarray - Affymetrix GeneChips Human Genome U133+ PM 24 array plates 
+### Other notes: analyzied 16p11.2 duplication and deletion carriers and controls.  **Note, some of their results were non-gene specifici (e.g could map to multiple NBPF genes).  In order to perform the analysis in R, I had to split up each of these individual genes, so for example, multiple NBPF genes may show up as "hits" when in fact the hit only applied to one or a subset of the genes - but the mircroarray probe couldn't distinguish between them ***
+
+```{r echo = FALSE}
+
+migliavacca.15 <- read.delim("~/LabProjects/GeneExpression/differential-expression-in-autism/migliavacca-2015/migliavacca-15-supp-table-s2-formatted.txt")
+
+hits.in.migliavacca <- list.of.genes %>% filter(gene.name %in% migliavacca.15$Gene.Symbol)
+
+hits.in.migliavacca$study <- "migliavacca.15.LCL.16p11.del.dup"
+hits.in.migliavacca$RNAsource <- "LCL"
+
+```
+
+```{r echo = FALSE}
+all.lcl.hits <- rbind(hits.in.nishimura.combined.fmr1.dup15q,
+                      hits.in.nishimura.fmr1.sam,
+                      hits.in.nishimura.fmr1.RankPod,
+                      hits.in.nishimura.dup15q.sam,
+                      hits.in.nishimura.dup15q.RankPod,
+                      hu.2009.AutsRsrch.all.autism.vs.controls, 
+                      hu.2009.AutsRsrch.diff.across.all.subgroups,
+                      hu.2009.AutsRsrch.4.class.analysis,
+                      hu.2009.AutsRsrch.language.impaired.fdr.0.1.percent,
+                      hu.2009.AutsRsrch.language.impaired.fdr.5percent,
+                      hu.2009.AutsRsrch.mild.symptom,
+                      hu.2009.AutsRsrch.savant.group,
+                      hits.in.hu.2009.plos,
+                      hits.in.seno.2010,
+                      hits.in.luo.2012,
+                      hits.in.migliavacca,
+                      hits.in.blumenthal.14.LCL.recip,
+                      hits.in.blumenthal.14.LCL.dup,
+                      hits.in.blumenthal.14.LCL.del,
+                      hits.in.blumenthal.14.mouse.recip,
+                      hits.in.blumenthal.14.mouse.dup,
+                      hits.in.blumenthal.14.mouse.del)
+
+```
+
+
+# Studies of differential expression in whole blood
+
+## Glatt, 2012
+### Sample Size:
+### RNA Source: peripheal blood mononculear cells isolated from whole blood
+### Analysis method: mircoarray 
+
+```{r echo = FALSE}
+glatt.2012 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/glatt-2012/glatt-2012-diff-expressed-probes-formatted.csv")
+
+hits.in.glatt.2012 <- list.of.genes %>% filter(gene.name %in% glatt.2012$Gene.Symbol) %>% rbind(no.gene.placeholder)
+
+hits.in.glatt.2012  %>% filter(gene.name != "NONE")
+
+hits.in.glatt.2012$study <- "glatt.2012.blood"
+hits.in.glatt.2012$RNAsource <- "blood"
+
+```
+
+## Kong, 2012 - PLOS One
+### Sample Size: 170 ASD cases and 115 age/sex-matched controls
+### RNA Source: whole blood
+### Analysis method: Affymetrix HG-U133 Plus 2.0 and Affymetrix Gene 1.0 ST
+### Other notes: two different cohorts analyzed; P1 (66 ASD and 33 controls) and P2 (104 ASD and 82 controls)
+
+```{r echo = FALSE}
+kong.2012.supp.1 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/kong-2012-plos-one/kong-2012-supp-table-1.csv")
+kong.2012.supp.2 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/kong-2012-plos-one/kong-2012-supp-table-2.csv")
+kong.2012.supp.4 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/kong-2012-plos-one/kong-2012-supp-4-predictor-genes.csv")
+
+
+hits.in.kong.P1.cohort <- list.of.genes %>% filter(gene.name %in% kong.2012.supp.1$Gene) %>% rbind(no.gene.placeholder)
+hits.in.kong.P2.cohort <- list.of.genes %>% filter(gene.name %in% kong.2012.supp.2$Gene) %>% rbind(no.gene.placeholder)
+hits.in.kong.predictor.genes <- list.of.genes %>% filter(gene.name %in% kong.2012.supp.4$Gene) %>% rbind(no.gene.placeholder)
+```
+
+### HLSA genes in list of differentially expressed genes in "P1" cohort
+```{r echo = FALSE}
+hits.in.kong.P1.cohort  %>% filter(gene.name != "NONE")
+
+hits.in.kong.P1.cohort$study <- "kong.2012.blood.P1cohort"
+hits.in.kong.P1.cohort$RNAsource <- "blood"
+```
+#### HLSA genes in list of differentially expressed genes in "P2" cohort
+```{r echo = FALSE}
+hits.in.kong.P2.cohort %>% filter(gene.name != "NONE")
+
+hits.in.kong.P2.cohort$study <- "kong.2012.blood.P2cohort"
+hits.in.kong.P2.cohort$RNAsource <- "blood"
+```
+#### HLSA genes in list of genes used as prediction model
+```{r echo = FALSE}
+hits.in.kong.predictor.genes %>% filter(gene.name != "NONE")
+
+hits.in.kong.predictor.genes$study <- "kong.2012.blood.PredictorGenes"
+hits.in.kong.predictor.genes$RNAsource <- "blood"
+```
+
+## Kong, 2013 - Neurogenetics
+### Sample Size: 20 probands and their unaffected siblings
+### RNA Source: whole blood
+### Analysis method: Microarray -  Affymetrix Gene 1.0 ST
+```{r echo = FALSE}
+kong.2013.supp.1 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/kong-2013-neurogenetics/kong-2013-supp-table-1.csv")
+
+hits.in.kong.2013.probands.vs.sibs <- list.of.genes %>% filter(gene.name %in% kong.2013.supp.1$Gene.Symbol) %>% rbind(no.gene.placeholder)
+
+hits.in.kong.2013.probands.vs.sibs %>% filter(gene.name != "NONE")
+
+hits.in.kong.2013.probands.vs.sibs$study <- "kong.2013.blood"
+hits.in.kong.2013.probands.vs.sibs$RNAsource <- "blood"
+
+```
+
+
+## Campbell, 2013  ** Need to double check details of RNASource, and other details ***
+### Sample Size:
+### RNA Source: Blood (I think)
+### Analysis method: microarray
+### Other notes: I think this study used the same expression data as in Luo, 2012 - resutls may be slightly different because they sub-divided full data set into a "neurogenesis group", but results of this study may not be independent from others (Luo, 2012)
+
+```{r echo = FALSE}
+campbell.13.simons.neuro <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/campbell-2013/campbell-2013-diff-exprs-in-simons-neurogenesis-subgroup.csv")
+
+hits.in.campbell.simons.neuro <- list.of.genes %>% filter(gene.name %in% campbell.13.simons.neuro$Gene.symbol)
+
+hits.in.campbell.simons.neuro$study <- "campbell.13.simons.neuro"
+hits.in.campbell.simons.neuro$RNAsource <- "blood"
+```
+
+
+```{r echo = FALSE}
+## Combine all blood hits
+
+all.blood.hits <- rbind(hits.in.glatt.2012,hits.in.kong.P1.cohort, hits.in.kong.P2.cohort, hits.in.kong.predictor.genes,hits.in.kong.2013.probands.vs.sibs, hits.in.campbell.simons.neuro)
+
+```
+
+# Analyses of differentially expressed genes in iPS cells from ASD cases and controls that were coaxed into being neuronal-like structures
+
+## Mariani, 2015
+### Sample Size:
+### RNA Source: iPSC generated neural structures
+### Analysis method: RNA-seq
+### Other notes: analyzed differentially expressed genes at two time-points in the development of their neural structures
+
+```{r echo=FALSE}
+mariani.15 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/mariani-2015/mariani-15-table-s2a.csv")
+
+hits.in.mariani.day11 <- list.of.genes %>% filter(gene.name %in% mariani.15$geneID.day11)
+hits.in.mariani.day31 <- list.of.genes %>% filter(gene.name %in% mariani.15$geneID.day31)
+
+hits.in.mariani.day11$study <- "mariani.15.iPSC.neural.structures"
+hits.in.mariani.day11$RNAsource <- "iPSC.neural"
+
+hits.in.mariani.day31$study <- "mariani.15.iPSC.neural.structures"
+hits.in.mariani.day31$RNAsource <- "iPSC.neural"
+```
+
+#### HLSA genes in list of diferrentially expressed genes at Day 11
+```{r echo = FALSE}
+hits.in.mariani.day11
+```
+
+#### HLSA genes in list of differentially expressed genest at Day 31
+```{r echo=FALSE}
+hits.in.mariani.day31
+```
+
+```{r echo=FALSE}
+all.iPSC.neural <- rbind(hits.in.mariani.day11, hits.in.mariani.day31)
+```
+
+# Analyses of differential expression in cells with knock-out/knock-down of known autism genes
+# CHD8 knockdown/knockout
+
+## Wang, 2015
+### Sample Size:
+### RNA Source: Neurons and neural progenitor cells
+### Analysis method:
+### Other notes: Analyzed changes in gene expression in CDH8 hemizygous knockout neurons and neural progenitor cells
+
+```{r echo = FALSE}
+wang.2015 <-read.csv("~/LabProjects/GeneExpression/differential-expression-in-chd8-knockout/wang-2015/wang-2015-diff-expression-chd8-knockout.csv")
+
+# padj.Neuron <= 0.1
+hits.in.wang.2015.chd8.neuron <- wang.2015 %>% filter(genename %in% list.of.genes$gene.name) %>% 
+  select(genename, contains("pvalue"), contains("padj"), contains("reg"), contains("binding")) %>%
+  arrange(padj.Neuron) %>% filter(padj.Neuron <= 0.1) %>% select(genename) 
+
+colnames(hits.in.wang.2015.chd8.neuron) <- c("gene.name")
+ 
+# padj.NPC <= 0.1
+
+hits.in.wang.2015.chd8.npc <- wang.2015 %>% filter(genename %in% list.of.genes$gene.name) %>% 
+  select(genename, contains("pvalue"), contains("padj"), contains("reg"), contains("binding")) %>%
+  arrange(padj.NPC) %>% filter(padj.NPC <= 0.1) %>% select(genename) 
+
+colnames(hits.in.wang.2015.chd8.npc) <- c("gene.name")
+```
+
+#### HLSA genes in list of differentially expressed genes in neurons with p-value <= 0.1
+```{r echo = FALSE}
+hits.in.wang.2015.chd8.neuron %>% filter(gene.name != "NONE")
+
+hits.in.wang.2015.chd8.neuron$study <- "wang.2015.chd8.neurons"
+hits.in.wang.2015.chd8.neuron$RNAsource <- "CHD8knock"
+```
+#### HLSA genes in list of differentially expressed genes in neural progenitor cells with p-value <= 0.1
+```{r echo = FALSE}
+hits.in.wang.2015.chd8.npc %>% filter(gene.name != "NONE")
+
+hits.in.wang.2015.chd8.npc$study <- "wang.2015.cdh8.npc"
+hits.in.wang.2015.chd8.npc$RNAsource <- "CHD8knock"
+```
+
+## Cotney, 2014
+### Sample Size:
+### RNA Source:
+### Analysis method:
+### Other Notes: Analyzed gene expression following knockdown of CHD8 with two different shRNAs ("C" and "G")
+```{r echo = FALSE}
+# two different types of shRNA used "C" and "G"
+cotney.2014.C <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-chd8-knockout/cotney-2014/cotney-top-diff-expressed-genes-shRNA-C.csv")
+cotney.2014.G <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-chd8-knockout/cotney-2014/cotney-top-diff-expressed-genes-shRNA-G.csv")
+
+hits.in.cotney.C <- list.of.genes %>% filter(gene.name %in% cotney.2014.C$Gene) %>% rbind(no.gene.placeholder)
+hits.in.cotney.G <- list.of.genes %>% filter(gene.name %in% cotney.2014.G$Gene) %>% rbind(no.gene.placeholder)
+```
+#### HLSA genes in list of differentially expressed genes when CHD8 knocked down with shRNA "C"
+```{r echo = FALSE}
+hits.in.cotney.C %>% filter(gene.name != "NONE")
+
+hits.in.cotney.C$study <- "cotney.2014.chd8.shRNA"
+hits.in.cotney.C$RNAsource <- "CHD8knock"
+```
+#### HLSA genes in list of differentially expressed genes when CHD8 knocked down with shRNA "G"
+```{r echo = FALSE}
+hits.in.cotney.G %>% filter(gene.name != "NONE")
+
+hits.in.cotney.G$study <- "cotney.2014.chd8.shRNA"
+hits.in.cotney.G$RNAsource <- "CHD8knock"
+```
+
+## Wilkinson, 2015
+### Sample Size:
+### RNA Source:
+### Analysis method:
+### Other Notes: Knocked down CHD8 expression with siRNA
+
+```{r echo = FALSE}
+wilkinson.2015.coding <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-chd8-knockout/wilkinson-2015/wilkinson-2015-diff-exprs-chd8-knockdown.csv")
+wilkinson.2015.non.coding <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-chd8-knockout/wilkinson-2015/wilkinson-2015-diff-exps-non-coding-genes-chd8-knockdown.csv")
+
+hits.in.wilkinson.coding <- list.of.genes %>% filter(gene.name %in% wilkinson.2015.coding$Gene) %>% rbind(no.gene.placeholder)
+hits.in.wilkinson.non.coding <- list.of.genes %>% filter(gene.name %in% wilkinson.2015.non.coding$Gene) %>% rbind(no.gene.placeholder)
+```
+#### HLSA genes in list of coding genes differentially expressed after CHD8 knockdown with siRNA
+```{r echo = FALSE}
+hits.in.wilkinson.coding %>% filter(gene.name != "NONE")
+
+hits.in.wilkinson.coding$study <- "wilkinson.2015.chd8.siRNA"
+hits.in.wilkinson.coding$RNAsource <- "CHD8knock"
+```
+#### HLSA genes in list of non-coding genes differentially expressed after CHD8 knockdown with siRNA
+```{r echo = FALSE}
+hits.in.wilkinson.non.coding %>% filter(gene.name != "NONE")
+
+hits.in.wilkinson.non.coding$study <- "wilkinson.2015.chd8.siRNA"
+hits.in.wilkinson.non.coding$RNAsource <- "CHD8knock"
+```
+
+```{r echo = FALSE}
+all.CHD8knock <- rbind(hits.in.wang.2015.chd8.neuron,
+                       hits.in.wang.2015.chd8.npc,
+                       hits.in.cotney.C,
+                       hits.in.cotney.G,
+                       hits.in.wilkinson.coding,
+                       hits.in.wilkinson.non.coding)
+```
+
+# Analysis of FMRP targets/differential expression
+## Darnell, 2011
+### In MOUSE cells, they performed sequencing of RNAs bound to FMRP (cross-linking immunoprecipitation - CLIP)
+
+```{r echo = FALSE}
+
+darnell.2011.fmrp.bound.RNA.mouse <- read.csv("~/LabProjects/GeneExpression/RNAs-bound-to-FMRP/darnell-2011/darnell-2011-table-s2-RNAs-bound-to-FMRP.csv")
+
+
+hits.in.darnell.2011 <- list.of.genes %>% filter(gene.name %in% darnell.2011.fmrp.bound.RNA.mouse$GeneSymbol)
+
+hits.in.darnell.2011
+
+hits.in.darnell.2011$study <- "darnell.2011.FMRP.bound.mouse"
+hits.in.darnell.2011$RNAsource <- "FMRPbound"
+````
+
+## Ascano, 2012
+### What they did: determined RNAs bount to FMRP in human HEK293 cells
+
+```{r echo = FALSE}
+ascano.12.RNAs <- read.csv("~/LabProjects/GeneExpression/RNAs-bound-to-FMRP/ascano-12/ascano-12-supp-table-3-RNAs-bound-FMR1-family-members.csv")
+
+hits.in.ascano.12 <- list.of.genes %>% filter(gene.name %in% ascano.12.RNAs$Gene)
+
+hits.in.ascano.12$study <- "ascano.12.FMRP.bound.HEK293"
+hits.in.ascano.12$RNAsource <- "FMRPbound"
+
+ascano.12.RNAs %>% filter(Gene %in% hits.in.ascano.12$gene.name) %>% arrange(desc(Reads.FMR1.iso1)) %>% select(Gene, Reads.FMR1.iso1, Reads.FMR1.iso.7, Reads.FXR1, Reads.FXR2)
+```
+
+```{r echo = FALSE}
+# Combine all hits identified through FMRP binding
+all.fmrp.bound <- rbind(hits.in.darnell.2011, hits.in.ascano.12)
+
+```
+
+## Summary of all gene expression hits
+```{r echo = FALSE}
+all.diff.expression <- rbind(all.brain.hits,
+                             all.lcl.hits,
+                             all.blood.hits,
+                             all.CHD8knock,
+                             all.fmrp.bound,
+                             all.iPSC.neural) %>% arrange(gene.name)
+
+# Write the information to a tab delimited file and run the below bedtools command to summarize counts, then upload summarized data
+write.table(all.diff.expression, file = "~/LabProjects/HLSAgenes/all-gene-expression-hits.txt", sep = "\t", row.names = FALSE)
+
+# Bedtools command
+# bedtools groupby -i all-gene-expression-hits.txt -g 1 -c 2,3,3 -o distinct,collapse,count | sed 's/"//g' | sed 's/,/, /g' > all-gene-expression-hits-summary-counts.txt
+
+#all.diff.expression.summary.counts <- read.delim("~/LabProjects/HLSAgenes/all-gene-expression-hits-summary-counts.txt")
+#colnames(all.diff.expression.summary.counts) <- c("gene.name", "studies","RNAsource","count")
+
+#all.diff.expression.summary.counts <- all.diff.expression.summary.counts %>% arrange(desc(count), gene.name) %>% filter(gene.name != "NONE")
+
+#all.diff.expression.summary.counts
+```
+
+####### Notes to Do
+Include Ivanov paper results
+Incorporate Liu, 2016 data -- supplementary data already in folder 
+
+###### look at all genes
+
+all.genes <- c(as.vector(garbett.08$SYMBOL),
+               as.vector(voineagu.diff.exp$Gene.Symbol),
+               as.vector(voineagu.replication.cohort$Gene.Symbol),
+               as.vector(voineagu.diff.splicing$Gene.Symbol),
+               as.vector(chow.supp.2.diff.expressed.in.young.cases$Gene),
+               as.vector(chow.supp.4.top.diff.expressed.in.adult.cases$Symbol),
+               as.vector(chow.supp.5.top.diff.expressed.across.young.and.adult$Symbol),
+               as.vector(ginsberg.supp.3.top.diff.cntrllng.for.brain.region$Gene.symbol),
+               as.vector(ginsberg.supp.6.top.diff.in.cerebellum$Gene.symbol),
+               as.vector(ziats.2012.lncRNA$Sequence.Symbol),
+               as.vector(ziats.2012.mRNA.pfc$GeneSymbol),
+               as.vector(ziats.2012.mRNA.cerebellum$GeneSymbol),
+               as.vector(gupta.2014.genes$Gene),
+               as.vector(nishimura.07.combined.fmr1.dup15q.vs.controls$Symbol),
+               as.vector(nishimura.07.fmr1.sam$Symbol),
+               as.vector(nishimura.07.fmr1.RankPod$Symbol),
+               as.vector(nishimura.07.dup15q.sam$Symbol),
+               as.vector(nishimura.07.dup15q.RankPod$Symbol),
+               as.vector(hu.supp.tbl.4$GENE_SYMBOL),
+               as.vector(hu.language.impaired.vs.controls.fdr.5percent$GENE_SYMBOL),
+               as.vector(hu.language.impaired.vs.controls.fdr.0.1percent$GENE_SYMBOL),
+               as.vector(hu.supp.tbl.6$GENE_SYMBOL),
+               as.vector(hu.supp.tbl.7$GENE_SYMBOL),
+               as.vector(hu.all.autism.vs.controls$GENE_SYMBOL),
+               as.vector(hu.tbl.3.across.all.subroups$Associated.gene),
+               as.vector(hu.2009.plos$Gene.Symbol),
+               as.vector(seno$SYMBOL),
+               as.vector(luo.2012$gene))

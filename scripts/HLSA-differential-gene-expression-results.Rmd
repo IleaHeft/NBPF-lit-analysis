@@ -1,0 +1,50 @@
+---
+title: "HLSA_Differential_Gene_Expression_Analysis"
+author: "Ilea Eskildsen Heft"
+date: "March 6, 2016"
+output: pdf_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+# Load required packages
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+# HLSA genes according to Fortna, 2004 and my preliminary BLAT analysis
+
+```{r}
+
+list.of.genes <- read.delim("~/LabProjects/GeneExpression/AllenBrainAtlas/data/developmental-transcriptome/list-of-genes.txt",
+                            sep = "\t",
+                            header = FALSE)
+
+colnames(list.of.genes) <- c("gene.name")
+
+list.of.genes <- list.of.genes %>% arrange(gene.name)
+
+list.of.genes
+```
+
+# Studies of Differential Expression in Post-mortem Brain
+
+## Voineagu, 2011
+### Brain area(s):
+### Analysis technique:
+
+```{r}
+### Read in Voineagu, 2011 data
+voineagu.diff.exp <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/voineagu-2011/voineagu-2011-differential-expression.csv") 
+voineagu.replication.cohort <-read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/voineagu-2011/voineagu-2011-replication-cohort-data.csv")
+voineagu.diff.splicing <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/voineagu-2011/voineagu-2011-replication-cohort-data.csv")
+
+
+### Report genes in my HLSA list that are also reported by voineagu, 2011 ####
+list.of.genes %>% filter(gene.name %in% voineagu.diff.exp$Gene.Symbol)
+list.of.genes %>% filter(gene.name %in% voineagu.replication.cohort$Gene.Symbol)
+list.of.genes %>% filter(gene.name %in% voineagu.diff.splicing$Gene.Symbol)
+```

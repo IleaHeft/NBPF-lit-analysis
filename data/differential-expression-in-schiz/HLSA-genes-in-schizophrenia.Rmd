@@ -1,0 +1,72 @@
+---
+title: "HLSA hits in schizophrenia studies"
+author: "Ilea Eskildsen Heft"
+date: "March 8, 2016"
+output: word_document
+---
+
+### RNA-Seq
+
+```{r echo=FALSE}
+wu.12 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-schiz/wu-2012/wu-12-supp-table-1.csv")
+
+list.of.genes %>% filter(gene.name %in% wu.12$Gene)
+
+```
+
+## Sanders, 2013
+### Sample Size:
+### RNA Source: LCL
+### Analysis method: Illumina microarray
+
+```{r echo = FALSE}
+sanders.13 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-schiz/Sanders-2013/sanders-2013-supp-table-1-diff-exprs-schiz.csv")
+
+hits.in.sanders <- list.of.genes %>% filter(gene.name %in% sanders.13$Gene.Abbreviation)
+
+```
+
+## Xiao, 2014
+
+### RNA Source: brain - BA9 and BA24 
+```{r echo = FALSE}
+
+xiao.2014.BA9 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-schiz/xiao-2014/xiao-14-diff-expr-schiz-BA9.csv")
+
+xiao.2014.BA24 <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-schiz/xiao-2014/xiao-14-diff-expr-schiz-BA24.csv")
+
+hits.in.xiao.BA9 <- list.of.genes %>% filter(gene.name %in% xiao.2014.BA9$up | gene.name %in% xiao.2014.BA9$down)
+
+hits.in.xiao.BA24 <- list.of.genes %>% filter(gene.name %in% xiao.2014.BA24$gene.up | gene.name %in% xiao.2014.BA24$gene.down)
+```
+
+```{r echo = FALSE}
+jalbrzikowski.15.del22q.all <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/jalbrzikowski-2015/jalbrzikowski-2015-table-s2-del22q-all.csv")
+jalbrzikowski.15.del22q.all$Symbol <- sub("*","",jalbrzikowski.15.del22q.all$Symbol, fixed = TRUE)
+
+hits.in.jalbrzikowski.del22q.all <- list.of.genes %>% filter(gene.name %in% jalbrzikowski.15.del22q.all$Symbol)
+
+jalbrzikowski.15.del22q.psy <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/jalbrzikowski-2015/jalbrzikowski-2015-table-s3-del22q-psy.csv")
+jalbrzikowski.15.del22q.psy$Symbol <- sub("*","",jalbrzikowski.15.del22q.psy$Symbol, fixed = TRUE)
+
+hits.in.jalbrzikowski.del22q.psy <- list.of.genes %>% filter(gene.name %in% jalbrzikowski.15.del22q.psy$Symbol)
+
+jalbrzikowski.15.del22q.asd <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-autism/jalbrzikowski-2015/jalbrzikowski-2015-table-s4-del22q-asd.csv")
+
+jalbrzikowski.15.del22q.asd$Symbol <- sub("*","",jalbrzikowski.15.del22q.asd$Symbol, fixed = TRUE)
+hits.in.jalbrzikowski.del22q.asd <- list.of.genes %>% filter(gene.name %in% jalbrzikowski.15.del22q.asd$Symbol)
+
+
+
+```
+
+## Zhao, 2015
+### Sample Size: 35 SCZ cases and 35 controls.  
+### RNASource: brain - anterior cingulated cortext (Brodmann region 24)
+### Analysis method: RNASeq
+## Study info: post-mortem brain samples from 35 SCZ patients, 35 BPD patients and 35 healthy controls. The brain region used was anterior cingulated cortex (Brodmann region 24), a region known to be involved in learning and executive functions, which are deficit in SCZ patients. Image studies of SCZ patients also showed abnormalities in this region
+```{r echo = FALSE}
+zhao.2015.schiz <- read.csv("~/LabProjects/GeneExpression/differential-expression-in-schiz/Zhao-2015/zhao-2015-supp-table1-diff-exprs-schiz.csv")
+
+hits.in.zhao <- list.of.genes %>% filter(gene.name %in% zhao.2015.schiz$Gene)
+```
