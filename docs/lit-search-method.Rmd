@@ -1,0 +1,28 @@
+# Describes the method used to identify relevant articles
+
+Multiple types of articles were looked at:  
+1. Studies of gene expression in ASD compared to contols  
+2. Studies that looked at binding targets of FMRP  
+3. Studies that looked at differences in expression when CHD8 was knocked out
+
+
+See Excel spreadsheet for list of each study included and relevant details
+
+## Studies of gene expression differences in ASD
+
+### Search criteria used:
+
+### Up to date as of: 
+
+### Studies included:
+
+
+
+## Studies that looked at binding targets of FMRP
+
+### Studies included:
+
+
+## Studies that looked at differential expression in CHD8 knockouts
+
+### Studies included:
